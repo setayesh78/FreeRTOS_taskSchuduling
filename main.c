@@ -1,5 +1,4 @@
 /*
-Authore : Setayesh Sanavi
     FreeRTOS V9.0.0 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
@@ -96,6 +95,11 @@ Authore : Setayesh Sanavi
 
 
 BaseType_t tsk;
+int is_suspend = 0;
+int count = 0;
+int is_resume = 1;
+TaskHandle_t task4,task3,task2,task1;
+
 //#include "queue.h"
 /* Examples */
 #define ERTS2_TASKMANAGEMENT
@@ -113,17 +117,18 @@ void vTask4();
 
 void vApplicationIdleHook(void);
 
-int main ( void )
-{
+int main ( void ) {
+
 #ifdef ERTS2_TASKMANAGEMENT
 	/* Creating Four Task with different Priorities and Delay*/
     printf("hellooooooooooooooooooooooooo\n");     
-    printf("creating vtask1 : %ld \n",xTaskCreate( vTask1, "Task 1", 1000, NULL, 4, NULL ));
-    printf("creating vtask2 : %ld \n",xTaskCreate( vTask2, "Task 2", 1000, NULL, 3, NULL ));
-    printf("creating vtask3 : %ld \n",xTaskCreate( vTask3, "Task 3", 1000, NULL, 2, NULL ));
-    printf("creating vtask4 : %ld \n",xTaskCreate( vTask4, "Task 4", 1000, NULL, 1, NULL ));      
-
-
+    
+    
+    printf("creating vtask1 : %ld \n",xTaskCreate( vTask1, "Task 1", 1000, NULL, 4, &task1 ));
+    printf("creating vtask2 : %ld \n",xTaskCreate( vTask2, "Task 2", 1000, NULL, 3, &task2 ));
+    printf("creating vtask3 : %ld \n",xTaskCreate( vTask3, "Task 3", 1000, NULL, 2, &task3 ));
+    printf("creating vtask4 : %ld \n",xTaskCreate( vTask4, "Task 4", 1000, NULL, 1, &task4 ));      
+            
 #endif
 
 	vTaskStartScheduler();
@@ -149,6 +154,22 @@ void vTask1( void *pvParameters ){
         for(;;){
             vTaskDelay( xDelay );
             printf("task1 :  %d ms\n",xDelay);
+        
+            count++;    
+                               
+            if(count == 2 && is_suspend == 0){
+            	is_suspend = 1;
+                printf("task 4 suspended...... %d seconds!\n",count);
+                count = 0;                
+                vTaskSuspend(task4);    		
+    	     }
+            else if(count == 2 && is_suspend == 1){
+            	is_suspend = 0;
+            	vTaskResume(task4);
+              	printf("task 4 resumed......%d\n seconds!",count); 
+              	count = 0;           	    
+            }
+                        
         }
 
         /* Tasks must not attempt to return from their implementing
@@ -158,52 +179,36 @@ void vTask1( void *pvParameters ){
         exit then have the task call vTaskDelete( NULL ) to ensure
         its exit is clean. */
         vTaskDelete( NULL );
-    }      
+    } 
+         
 void vTask2( void *pvParameters ){
 	const TickType_t xDelay = 750 / portTICK_PERIOD_MS;
         for(;;){
             vTaskDelay( xDelay );
             printf("task2 : %d ms\n",xDelay);
         }
-
-        /* Tasks must not attempt to return from their implementing
-        function or otherwise exit.  In newer FreeRTOS port
-        attempting to do so will result in an configASSERT() being
-        called if it is defined.  If it is necessary for a task to
-        exit then have the task call vTaskDelete( NULL ) to ensure
-        its exit is clean. */
         vTaskDelete( NULL );
-    }      
-void vTask3( void *pvParameters ){
+    }
+          
+void vTask3(){
 	const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
         for(;;){
             vTaskDelay( xDelay );
             printf("task3 :  %d ms\n",xDelay);
         }
-
-        /* Tasks must not attempt to return from their implementing
-        function or otherwise exit.  In newer FreeRTOS port
-        attempting to do so will result in an configASSERT() being
-        called if it is defined.  If it is necessary for a task to
-        exit then have the task call vTaskDelete( NULL ) to ensure
-        its exit is clean. */
         vTaskDelete( NULL );
     }
-void vTask4( void *pvParameters ){
+       
+void vTask4(){
 	const TickType_t xDelay = 250 / portTICK_PERIOD_MS;
-        for( ;; ){
+        for( ;; ){    	         		        
             vTaskDelay( xDelay );
             printf("task4 :  %d ms\n",xDelay);
         }
-
-        /* Tasks must not attempt to return from their implementing
-        function or otherwise exit.  In newer FreeRTOS port
-        attempting to do so will result in an configASSERT() being
-        called if it is defined.  If it is necessary for a task to
-        exit then have the task call vTaskDelete( NULL ) to ensure
-        its exit is clean. */
         vTaskDelete( NULL );
     }
+    
+    
     
 #endif
 /* CH3_TASKMANAGEMENT ends */
