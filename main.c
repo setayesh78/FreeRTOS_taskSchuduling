@@ -96,6 +96,7 @@
 
 BaseType_t tsk;
 int count = 0;
+int count1 = 0;
 int is_suspend = 0;
 TaskHandle_t task4,task3,task2,task1;
 
@@ -154,11 +155,13 @@ void vTask1( void *pvParameters ){
             vTaskDelay( xDelay );
             printf("task1 :  %d ms\n",xDelay);
         
-	    count += 1;            
-
-            if(count == 2 && is_suspend == 1){
+            if(is_suspend == 1){
+            count1++;   
+            }
+	             
+            if(count1 == 2 && is_suspend == 1){
             	is_suspend = 0;
-            	count = 0;
+            	count1 = 0;
             	vTaskResume(task4);
               	printf("task 4 resumed......\n"); 
               	          	    
