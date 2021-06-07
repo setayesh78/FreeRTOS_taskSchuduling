@@ -95,9 +95,8 @@
 
 
 BaseType_t tsk;
-int is_suspend = 0;
 int count = 0;
-int is_resume = 1;
+int is_suspend = 0;
 TaskHandle_t task4,task3,task2,task1;
 
 //#include "queue.h"
@@ -149,26 +148,26 @@ void vAssertCalled( unsigned long ulLine, const char * const pcFileName )
 
 #ifdef ERTS2_TASKMANAGEMENT
 
-void vTask1(){
+void vTask1( void *pvParameters ){
 	const TickType_t xDelay = 1000 / portTICK_PERIOD_MS;
-        for(;;){	       
+        for(;;){
             vTaskDelay( xDelay );
-            printf("task1 :  %d ms\n",xDelay);         
-                                   
-	    count += xDelay;                            
-            if(count >= 2000 && is_suspend == 0){
+            printf("task1 :  %d ms\n",xDelay);
+        
+	    count += 1;            
+            if(count == 2 && is_suspend == 0){
             	is_suspend = 1;
                 printf("task 4 suspended......\n");
                 count = 0;                
                 vTaskSuspend(task4);    		
     	     }
-            else if(count >= 2000 && is_suspend == 1){
+            else if(count == 2 && is_suspend == 1){
             	is_suspend = 0;
             	count = 0;
             	vTaskResume(task4);
               	printf("task 4 resumed......\n"); 
               	          	    
-            }
+            } 
                         
         }
 
@@ -181,73 +180,29 @@ void vTask1(){
         vTaskDelete( NULL );
     } 
          
-void vTask2(){
-
+void vTask2( void *pvParameters ){
 	const TickType_t xDelay = 750 / portTICK_PERIOD_MS;
-        for(;;){	        
+        for(;;){
             vTaskDelay( xDelay );
             printf("task2 : %d ms\n",xDelay);
-	    count += xDelay;            
-            if(count >= 2000 && is_suspend == 0){
-            	is_suspend = 1;
-                printf("task 4 suspended......\n");
-                count = 0;                
-                vTaskSuspend(task4);    		
-    	     }
-            else if(count >= 2000 && is_suspend == 1){
-            	is_suspend = 0;
-            	count = 0;
-            	vTaskResume(task4);
-              	printf("task 4 resumed......\n"); 
-              	          	    
-            }            
         }
         vTaskDelete( NULL );
     }
           
 void vTask3(){
-
 	const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
-        for(;;){	           
+        for(;;){
             vTaskDelay( xDelay );
             printf("task3 :  %d ms\n",xDelay);
-            count += xDelay ;
-            if(count >= 2000 && is_suspend == 0){
-            	is_suspend = 1;
-                printf("task 4 suspended......\n");
-                count = 0;                
-                vTaskSuspend(task4);    		
-    	     }
-            else if(count >= 2000 && is_suspend == 1){
-            	is_suspend = 0;
-            	count = 0;
-            	vTaskResume(task4);
-              	printf("task 4 resumed......\n"); 
-              	           	    
-            }            
         }
         vTaskDelete( NULL );
     }
        
 void vTask4(){
 	const TickType_t xDelay = 250 / portTICK_PERIOD_MS;
-        for( ;; ){	    			        
+        for( ;; ){    	         		        
             vTaskDelay( xDelay );
             printf("task4 :  %d ms\n",xDelay);
-            count += xDelay ;
-            if(count >= 2000 && is_suspend == 0){
-            	is_suspend = 1;
-                printf("task 4 suspended......\n");
-                count = 0;                
-                vTaskSuspend(task4);    		
-    	     }
-            else if(count >= 2000 && is_suspend == 1){
-            	is_suspend = 0;
-              	count = 0;            	
-            	vTaskResume(task4);
-              	printf("task 4 resumed......\n");            	    
-            }
-                        
         }
         vTaskDelete( NULL );
     }
