@@ -155,13 +155,8 @@ void vTask1( void *pvParameters ){
             printf("task1 :  %d ms\n",xDelay);
         
 	    count += 1;            
-            if(count == 2 && is_suspend == 0){
-            	is_suspend = 1;
-                printf("task 4 suspended......\n");
-                count = 0;                
-                vTaskSuspend(task4);    		
-    	     }
-            else if(count == 2 && is_suspend == 1){
+
+            if(count == 2 && is_suspend == 1){
             	is_suspend = 0;
             	count = 0;
             	vTaskResume(task4);
@@ -203,6 +198,13 @@ void vTask4(){
         for( ;; ){    	         		        
             vTaskDelay( xDelay );
             printf("task4 :  %d ms\n",xDelay);
+            count++;
+            if(count == 8 && is_suspend == 0){
+            	is_suspend = 1;
+                printf("task 4 suspended......\n");
+                count = 0;                
+                vTaskSuspend(task4);    		
+    	     }            
         }
         vTaskDelete( NULL );
     }
